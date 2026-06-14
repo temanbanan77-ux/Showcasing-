@@ -1,0 +1,58 @@
+#include <Geode/Geode.hpp>
+#include <Geode/modify/EditorUI.hpp>
+#include <Geode/modify/LevelEditorLayer.hpp>
+
+using namespace geode::prelude;
+
+class $modify(MyEditorUI, EditorUI) {
+    // 1. Добавляем кнопку в интерфейс редактора
+    bool init(LevelEditorLayer* editor) {
+        if (!EditorUI::init(editor)) return false;
+
+        // Создаем спрайт для кнопки (возьмем стандартную иконку черепа или триггера)
+        auto sprite = CCSprite::createWithSpriteFrameName("GJ_plusBtn_001.png");
+        
+        // Создаем саму кнопку
+        auto btn = CCMenuItemSpriteExtra::create(
+            sprite,
+            this,
+            menu_selector(MyEditorUI::onGenerateFakeDeath)
+        );
+
+        // Ищем меню в редакторе, куда добавить кнопку (обычно правая панель)
+        if (auto menu = this->getChildByID("right-side-menu")) {
+            menu->addChild(btn);
+            menu->updateLayout();
+        }
+
+        return true;
+    }
+
+    // 2. Логика генерации уровня по твоему описанию
+    void onGenerateFakeDeath(CCObject*) {
+        std::stringstream levelData;
+
+        // --- ОПИСАНИЕ ОБЪЕКТОВ ---
+        
+        // 1. Ставим платформу (ID 1) под игроком
+        levelData << "1,1,2,100,3,45;";
+        levelData << "1,1,2,130,3,45;";
+
+        // 2. Ставим «Смертельный» шип (ID 35)
+        levelData << "1,35,2,160,3,45;";
+
+        // 3. Добавляем Alpha-триггер (ID 1007), чтобы скрыть игрока (группа 1)
+        // Свойства: X=80, Y=100, Группа(71)=1, Время(10)=0, Прозрачность(11)=0
+        levelData << "1,1007,2,80,3,100,71,1,10,0,11,0;";
+
+        // 4. Добавляем Shake-триггер (ID 1825) для эффекта удара
+        // Свойства: X=160, Y=100, Длительность(51)=0.5, Сила(52)=20
+        levelData << "1,1825,2,160,3,120,51,0.5,52,20;";
+
+        // 5. Добавляем текст «GAME OVER?» (ID 914) для красоты
+        // Свойства: X=220, Y=150, Текст(31) в Base64
+        levelData << "1,914,2,220,3,150,31,R0FNRSBPVkVSID8=;";
+
+        // Отправляем всю эту строку в редактор
+        auto editorLayer = LevelEditorLayer::get
+

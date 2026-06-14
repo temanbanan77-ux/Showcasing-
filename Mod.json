@@ -1,0 +1,11 @@
+{
+    "geode": "3.0.0",
+    "version": "v1.0.0",
+    "id": "artem.showcasing",
+    "name": "Showcasing Mod",
+    "developer": "Artem",
+    "description": "Автоматическое отображение и демонстрация объектов в редакторе Geometry Dash.",
+    "repository": "",
+    "dependencies": []
+}
+
